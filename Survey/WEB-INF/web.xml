@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>Survey_01_UI</display-name>
+
+	<!-- 指定应用上下文参数，主要给监听器使用的参数。 String filename = application.getInitParameter("contextConfigLocation"); -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring-context.xml</param-value>
+	</context-param>
+	<!-- 核心监听器：创建IOC容器。 ClassPathXmlApplicationContext 用于JUnit单元测试 XmlWebApplicationContext 
+		用于Web环境下，由监听器创建IOC容器对象，然后，将IOC对象存放到application域里了。 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- 字符编码过滤器：只能解决POST请求乱码问题。
+		如果是get请求乱码问题：Tomcat/conf/servlet.xml  L61  增加URIEncoding="UTF-8"属性。
+			<Connector URIEncoding="UTF-8" connectionTimeout="20000" 
+						port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
+		字符编码过滤器必须配置在其他过滤器之前。否则，其他过滤后一旦从request中获取请求参数，就破坏了请求编码了。
+	 -->
+	<filter>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 配置支持REST风格URL地址的Filter		
+	-->
+	<filter>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- SpringMVC框架的核心控制器 -->
+	<servlet>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:springmvc-context.xml</param-value>
+		</init-param>
+		<!-- 表示Servlet对象被创建时机： 大于等于0的整数值：表示服务器启动时创建Servlet对象。值越小优先级越高 小于0的整数值：表示第一次请求Servlet时创建Servlet对象。 -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
